@@ -1079,7 +1079,7 @@ void setGainMenu() {
 
 void setFilterMenu() {
     lcd.setCursor(0, 0);
-    displayEffectValue(1, 1, vFilterFreq / kFilterFreqMax * 100.0);
+    displayEffectValue(1, 1, (float)vFilterFreq / (float)kFilterFreqMax * 100.0);
 }
 
 void setWetMenu() {
@@ -1113,7 +1113,7 @@ void printParameters(void)
     Serial.print("Gain In=");
     Serial.print(vGainIn / kGainInMax * 100.0);
     Serial.print("%, Filter=");
-    Serial.print(vFilterFreq / kFilterFreqMax * 100.0);
+    Serial.print((float)vFilterFreq / (float) kFilterFreqMax * 100.0);
     Serial.print("%, DryWet=");
     Serial.print(vWet * 100.0);
     Serial.print("%, Volume=");
