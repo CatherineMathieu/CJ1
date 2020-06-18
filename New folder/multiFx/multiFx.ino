@@ -141,10 +141,10 @@ void loop()
 {
     if ((msec > tUpdate))
     {
-        vGainIn = (float) analogRead(A3) / (1023.0 / kGainInMax); //GAININ_PIN
-        vFilterFreq = (float) analogRead(A2) / (1023.0 * kFilterFreqMax);//FILTER_PIN
-        vWet = (float) analogRead(A1) / (1023.0); //WET_PIN
-        vVolume = (float) analogRead(A0) / (1023.0 / kVolumeMax); //VOL_PIN
+        vGainIn = (float) analogRead(GAININ_PIN) / (1023.0 / kGainInMax); //GAININ_PIN
+        vFilterFreq = (float) analogRead(FILTER_PIN) / 1023.0 * (float)kFilterFreqMax;//FILTER_PIN
+        vWet = (float) analogRead(WET_PIN) / (1023.0); //WET_PIN
+        vVolume = (float) analogRead(VOL_PIN) / (1023.0 / kVolumeMax); //VOL_PIN
 
         setGainIn(vGainIn);
         setFilterFreq(vFilterFreq);
@@ -159,7 +159,7 @@ void loop()
         setWetMenu();
         setVolMenu();
 
-        if(counter > 999){
+        if(counter > 300){
             printParameters();
             counter = 0;
         }
@@ -272,20 +272,20 @@ void initializeState()
 
 void zeroInputs(AudioMixer4 &mixerL, AudioMixer4 &mixerR)
 {
-for (int i = 0; i != 4; ++i)
-{
-mixerL.gain(i, OFF);
-mixerR.gain(i, OFF);
-}
+    for (int i = 0; i != 4; ++i)
+    {
+        mixerL.gain(i, OFF);
+        mixerR.gain(i, OFF);
+    }
 }
 
 void zeroInputs(AudioMixer4 &mixerL, AudioMixer4 &mixerR, int start, int end)
 {
-for (int i = start; i != end + 1; ++i)
-{
-mixerL.gain(i, OFF);
-mixerR.gain(i, OFF);
-}
+    for (int i = start; i != end + 1; ++i)
+    {
+        mixerL.gain(i, OFF);
+        mixerR.gain(i, OFF);
+    }
 }
 
 void configurePins(void)
@@ -306,7 +306,6 @@ void configurePins(void)
     pinMode(LED_FX3_PIN, OUTPUT);
     pinMode(LED_FX4_PIN, OUTPUT);
     pinMode(SYSTEM_LED, OUTPUT);
-
 }
 
 void configureAudioAdaptor(void)
