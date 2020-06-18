@@ -70,7 +70,8 @@ const int menuChorus = 1;
 int menuState = menuMain;
 int rot1_currStateA;
 int rot1_prevStateA;
-int counterRotary = 0;
+int chorusState = 0;
+int nbVoices = 4;
 
 void sayHello(){
     //running
@@ -189,13 +190,11 @@ void loop()
           if ((rot1_currStateA != rot1_prevStateA)&&(rot1_prevStateA == HIGH)) {
             digitalRead(ROT1_B);
             if (digitalRead(ROT1_B) != rot1_currStateA) {
-                counterRotary++;
+                nbVoices++;
             } else {
-                counterRotary--;
+                nbVoices--;
             }
-            lcd.setCursor(0, 3);
-            lcd.print(counterRotary);
-            lcd.print("   "); 
+            setnbVoicesMenu();
           }
           rot1_prevStateA = rot1_currStateA;
         }
@@ -284,12 +283,14 @@ void updateState()
         if (state & S_CHORUS)
         {
             digitalWrite(LED_FX4_PIN, HIGH);
+            chorusState = 1;
             Serial.println("CHORUS ON");
             displayOnOffEffectMenu(0, 1);
         }
         else
         {
             digitalWrite(LED_FX4_PIN, LOW);
+            chorusState = 0;
             Serial.println("CHORUS OFF");
             displayOnOffEffectMenu(0, 0);
         }
@@ -1130,25 +1131,28 @@ void createChorusMenu() {
     lcd.print("Chorus ");
     lcd.print("nbVoices ");
 
+    displayOnOffEffectMenu(0, 3);
+    setnbVoicesMenu();
+}
+
+void setnbVoicesMenu() {
+    lcd.setCursor(10, 3);
+    lcd.print(nbVoices);
 }
 
 void setGainMenu() {
-    lcd.setCursor(0, 0);
     displayEffectValue(1, 0, vGainIn / kGainInMax * 100.0);
 }
 
 void setFilterMenu() {
-    lcd.setCursor(0, 0);
     displayEffectValue(1, 1, (float)vFilterFreq / kFilterFreqMax * 100.0);
 }
 
 void setWetMenu() {
-    lcd.setCursor(0, 0);
     displayEffectValue(1, 2, vWet * 100.0);
 }
 
 void setVolMenu() {
-    lcd.setCursor(0, 0);
     displayEffectValue(1, 3, vVolume / kVolumeMax * 100.0);
 }
 
@@ -1163,6 +1167,13 @@ void displayOnOffEffectMenu(int valueIndex, int displayStatut) {
   if(menuState == menuMain){
     lcd.setCursor(valueIndex * 5, 3);
     if(displayStatut == 1){
+        lcd.print("ON   ");
+    } else {
+        lcd.print("OFF  ");
+    }
+  } else if(menuState == menuChorus){
+    lcd.setCursor(0, 3);
+    if(chorusState == 1){
         lcd.print("ON   ");
     } else {
         lcd.print("OFF  ");
