@@ -129,7 +129,7 @@ void setup() {
     configureDelay();
     configureFlange();
     configureChorus();
-    //configureFilter();
+    configureFilter();
 
     switchLogic();
 
@@ -142,7 +142,7 @@ void loop()
     if ((msec > tUpdate))
     {
         vGainIn = (float) analogRead(GAININ_PIN) / (1023.0 / kGainInMax); //GAININ_PIN
-        vFilterFreq = (float) analogRead(FILTER_PIN) / 1023.0 * (float)kFilterFreqMax;//FILTER_PIN
+        vFilterFreq = (float) analogRead(FILTER_PIN) / 1023.0 * kFilterFreqMax;//FILTER_PIN
         vWet = (float) analogRead(WET_PIN) / (1023.0); //WET_PIN
         vVolume = (float) analogRead(VOL_PIN) / (1023.0 / kVolumeMax); //VOL_PIN
 
@@ -1078,7 +1078,7 @@ void setGainMenu() {
 
 void setFilterMenu() {
     lcd.setCursor(0, 0);
-    displayEffectValue(1, 1, (float)vFilterFreq / (float)kFilterFreqMax * 100.0);
+    displayEffectValue(1, 1, (float)vFilterFreq / kFilterFreqMax * 100.0);
 }
 
 void setWetMenu() {
@@ -1112,7 +1112,7 @@ void printParameters(void)
     Serial.print("Gain In=");
     Serial.print(vGainIn / kGainInMax * 100.0);
     Serial.print("%, Filter=");
-    Serial.print((float)vFilterFreq / (float) kFilterFreqMax * 100.0);
+    Serial.print((float)vFilterFreq / kFilterFreqMax * 100.0);
     Serial.print("%, DryWet=");
     Serial.print(vWet * 100.0);
     Serial.print("%, Volume=");
