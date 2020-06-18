@@ -19,6 +19,9 @@
 #define LED_FX3_PIN     2  //FLANGE
 #define LED_FX4_PIN     3  //CHORUS
 #define SYSTEM_LED      13
+#define ROT1_A 1
+#define ROT1_B 0
+#define ROT1_CLK 22
 
 #define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
 #define CHORUS_DELAY_LENGTH (16*AUDIO_BLOCK_SAMPLES)
@@ -63,9 +66,8 @@ Bounce bFx3Bypass = Bounce(FX3_PIN,15);
 Bounce bFx4Bypass = Bounce(FX4_PIN,15);
 
 const int menuMain = 0;
+const int menuChorus = 1;
 int menuState = menuMain;
-
-
 
 void sayHello(){
     //running
@@ -105,8 +107,6 @@ void sayHello(){
         delay(200);
     }
 
-    initializeLcd();
-
     digitalWrite(SYSTEM_LED, HIGH);
     toggle = HIGH;
 }
@@ -134,6 +134,7 @@ void setup() {
     switchLogic();
 
     sayHello();
+    initializeLcd();
     createMainMenu();
 }
 
@@ -159,6 +160,16 @@ void loop()
         setWetMenu();
         setVolMenu();
 
+        if(digitalRead(ROT1_CLK)!= HIGH){
+          menuState = menuState == menuMain ? menuChorus : menuMain;
+          if (menuState != menuChorus) {
+              createMainMenu();
+          }else {
+            createChorusMenu();
+          }
+          delay(100);
+        }
+        
         if(counter > 300){
             printParameters();
             counter = 0;
@@ -306,6 +317,10 @@ void configurePins(void)
     pinMode(LED_FX3_PIN, OUTPUT);
     pinMode(LED_FX4_PIN, OUTPUT);
     pinMode(SYSTEM_LED, OUTPUT);
+    //Rotary Pins
+    pinMode(ROT1_A, INPUT_PULLUP);
+    pinMode(ROT1_B, INPUT_PULLUP);
+    pinMode(ROT1_CLK, INPUT_PULLUP);
 }
 
 void configureAudioAdaptor(void)
@@ -1071,6 +1086,27 @@ void createMainMenu() {
     displayOnOffEffectMenu(3, 0);
 }
 
+void createChorusMenu() {
+    menuState = menuChorus;
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Gain ");
+    lcd.print("Filt ");
+    lcd.print("Wet  ");
+    lcd.print("Vol  ");
+
+    setGainMenu();
+    setFilterMenu();
+    setWetMenu();
+    setVolMenu();
+
+    lcd.setCursor(0, 2);
+    lcd.print("Chorus ");
+    lcd.print("nbVoices ");
+
+}
+
 void setGainMenu() {
     lcd.setCursor(0, 0);
     displayEffectValue(1, 0, vGainIn / kGainInMax * 100.0);
@@ -1099,12 +1135,15 @@ void displayEffectValue(int rowIndex, int valueIndex, int value) {
 }
 
 void displayOnOffEffectMenu(int valueIndex, int displayStatut) {
+  if(menuState == menuMain){
     lcd.setCursor(valueIndex * 5, 3);
     if(displayStatut == 1){
         lcd.print("ON   ");
     } else {
         lcd.print("OFF  ");
     }
+  }
+  //No display On/off for 2nd level menu
 }
 
 void printParameters(void)
