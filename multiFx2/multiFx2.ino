@@ -68,6 +68,9 @@ Bounce bFx4Bypass = Bounce(FX4_PIN,15);
 const int menuMain = 0;
 const int menuChorus = 1;
 int menuState = menuMain;
+int rot1_currStateA;
+int rot1_prevStateA;
+int counterRotary = 0;
 
 void sayHello(){
     //running
@@ -166,17 +169,36 @@ void loop()
               createMainMenu();
           }else {
             createChorusMenu();
+            rot1_prevStateA = digitalRead(ROT1_A);
           }
           delay(100);
         }
         
-        if(counter > 300){
-            printParameters();
-            counter = 0;
-        }
-        counter++;
-        msec = 0;
+      if(counter > 300){
+        printParameters();
+        counter = 0;
+      }
+      counter++;
+      msec = 0;
     }
+
+    if(menuState == menuChorus){
+          digitalRead(ROT1_A);
+          rot1_currStateA = digitalRead(ROT1_A);
+          
+          if ((rot1_currStateA != rot1_prevStateA)&&(rot1_prevStateA == HIGH)) {
+            digitalRead(ROT1_B);
+            if (digitalRead(ROT1_B) != rot1_currStateA) {
+                counterRotary++;
+            } else {
+                counterRotary--;
+            }
+            lcd.setCursor(0, 3);
+            lcd.print(counterRotary);
+            lcd.print("   "); 
+          }
+          rot1_prevStateA = rot1_currStateA;
+        }
 //    if(toggle){
 //      digitalWrite(SYSTEM_LED, toggle);
 //      toggle = LOW;
@@ -388,7 +410,10 @@ void configureFlange(void)
 
 void configureChorus(void)
 {
-    const float vChorusVoices = 4;
+  setNumberVoicesChorus(4);
+}
+
+void setNumberVoicesChorus(int vChorusVoices){
 
     if(!chorusL.begin(chorusDelayLineL, CHORUS_DELAY_LENGTH, vChorusVoices))
     {
