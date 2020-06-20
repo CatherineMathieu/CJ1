@@ -167,7 +167,7 @@ void loop()
         if(digitalRead(ROT1_CLK)!= HIGH){
           menuState = menuState == menuMain ? menuChorus : menuMain;
           if (menuState != menuChorus) {
-              createMainMenu();
+            createMainMenu();
           }else {
             createChorusMenu();
             rot1_prevStateA = digitalRead(ROT1_A);
@@ -194,6 +194,7 @@ void loop()
             } else {
                 nbVoices--;
             }
+            setNbVoices();
             setnbVoicesMenu();
           }
           rot1_prevStateA = rot1_currStateA;
@@ -411,26 +412,25 @@ void configureFlange(void)
 
 void configureChorus(void)
 {
-  setNumberVoicesChorus(4);
-}
-
-void setNumberVoicesChorus(int vChorusVoices){
-
-    if(!chorusL.begin(chorusDelayLineL, CHORUS_DELAY_LENGTH, vChorusVoices))
+    if(!chorusL.begin(chorusDelayLineL, CHORUS_DELAY_LENGTH, nbVoices))
     {
         Serial.println("AudioEffectChorus - left channel begin failed");
         while(1);
     }
-    if(!chorusR.begin(chorusDelayLineR, CHORUS_DELAY_LENGTH, vChorusVoices))
+    if(!chorusR.begin(chorusDelayLineR, CHORUS_DELAY_LENGTH, nbVoices))
     {
         Serial.println("AudioEffectChorus - right channel begin failed");
         while(1);
     }
 
-    chorusL.voices(vChorusVoices);
-    chorusR.voices(vChorusVoices);
+    setNbVoices();
 
     zeroInputs(mixerChorusInL, mixerChorusInR);
+}
+
+void setNbVoices(){
+   chorusL.voices(nbVoices);
+   chorusR.voices(nbVoices);
 }
 
 void configureMixerFx(void)
