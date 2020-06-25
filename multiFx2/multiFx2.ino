@@ -22,6 +22,15 @@
 #define ROT1_A 1
 #define ROT1_B 0
 #define ROT1_CLK 22
+//#define ROT2_A 0
+//#define ROT2_B 0
+//#define ROT2_CLK 0
+//#define ROT3_A 0
+//#define ROT3_B 0
+//#define ROT3_CLK 0
+//#define ROT4_A 0
+//#define ROT4_B 0
+//#define ROT4_CLK 0
 
 #define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
 #define CHORUS_DELAY_LENGTH (16*AUDIO_BLOCK_SAMPLES)
@@ -67,10 +76,22 @@ Bounce bFx4Bypass = Bounce(FX4_PIN,15);
 
 const int menuMain = 0;
 const int menuChorus = 1;
+const int menuFlange = 2;
+const int menuDelay = 3;
+const int menuReverb = 4;
 int menuState = menuMain;
 int rot1_currStateA;
 int rot1_prevStateA;
+int rot2_currStateA;
+int rot2_prevStateA;
+int rot3_currStateA;
+int rot3_prevStateA;
+int rot4_currStateA;
+int rot4_prevStateA;
 int chorusState = 0;
+int flangeState = 0;
+int delayState = 0;
+int reverbState = 0;
 int nbVoices = 4;
 
 void sayHello(){
@@ -171,9 +192,34 @@ void loop()
           }else {
             createChorusMenu();
             rot1_prevStateA = digitalRead(ROT1_A);
-          }
+          } 
           delay(100);
-        }
+        } 
+//        else if(digitalRead(ROT2_CLK)!= HIGH){
+//          if (menuState != menuFlange) {
+//            createMainMenu();
+//          }else {
+//            createFlangeMenu();
+//            rot2_prevStateA = digitalRead(ROT2_A);
+//          }
+//          delay(100);
+//        }else if(digitalRead(ROT3_CLK)!= HIGH){
+//          if (menuState != menuDelay) {
+//            createMainMenu();
+//          }else {
+//            createDelayMenu();
+//            rot3_prevStateA = digitalRead(ROT3_A);
+//          }
+//          delay(100);
+//        }else if(digitalRead(ROT4_CLK)!= HIGH){
+//          if (menuState != menuReverb) {
+//            createMainMenu();
+//          }else {
+//            createReverbMenu();
+//            rot4_prevStateA = digitalRead(ROT4_A);
+//          }
+//          delay(100);
+//        }
         
       if(counter > 300){
         printParameters();
@@ -184,30 +230,27 @@ void loop()
     }
 
     if(menuState == menuChorus){
-          digitalRead(ROT1_A);
-          rot1_currStateA = digitalRead(ROT1_A);
-          
-          if ((rot1_currStateA != rot1_prevStateA)&&(rot1_prevStateA == HIGH)) {
-            digitalRead(ROT1_B);
-            if (digitalRead(ROT1_B) != rot1_currStateA) {
-                nbVoices++;
-            } else {
-                nbVoices--;
-            }
-            setNbVoices();
-            setnbVoicesMenu();
+        digitalRead(ROT1_A);
+        rot1_currStateA = digitalRead(ROT1_A);
+        
+        if ((rot1_currStateA != rot1_prevStateA)&&(rot1_prevStateA == HIGH)) {
+          digitalRead(ROT1_B);
+          if (digitalRead(ROT1_B) != rot1_currStateA) {
+              nbVoices++;
+          } else {
+              nbVoices--;
           }
-          rot1_prevStateA = rot1_currStateA;
+          setNbVoices();
+          setnbVoicesMenu();
         }
-//    if(toggle){
-//      digitalWrite(SYSTEM_LED, toggle);
-//      toggle = LOW;
-//    }
-//    else{
-//      digitalWrite(SYSTEM_LED, toggle);
-//      toggle = HIGH;
-//    }
-//    //delay(50);
+        rot1_prevStateA = rot1_currStateA;
+      } else if(menuState == menuFlange){
+        // todo: implement parameters
+      } else if(menuState == menuDelay){
+        // todo: implement parameters
+      } else if(menuState == menuReverb){
+        // todo: implement parameters
+      }
 }
 
 void updateState()
@@ -224,12 +267,14 @@ void updateState()
         if (state & S_REVERB)
         {
             digitalWrite(LED_FX1_PIN, HIGH);
+            reverbState = 1;
             Serial.println("REVERB ON");
             displayOnOffEffectMenu(3, 1);
         }
         else
         {
             digitalWrite(LED_FX1_PIN, LOW);
+            reverbState = 0;
             Serial.println("REVERB OFF");
             displayOnOffEffectMenu(3, 0);
         }
@@ -244,12 +289,14 @@ void updateState()
         if (state & S_DELAY)
         {
             digitalWrite(LED_FX2_PIN, HIGH);
+            delayState = 1;
             Serial.println("DELAY ON");
             displayOnOffEffectMenu(2, 1);
         }
         else
         {
             digitalWrite(LED_FX2_PIN, LOW);
+            delayState = 0;
             Serial.println("DELAY OFF");
             displayOnOffEffectMenu(2, 0);
         }
@@ -264,12 +311,14 @@ void updateState()
         if (state & S_FLANGE)
         {
             digitalWrite(LED_FX3_PIN, HIGH);
+            flangeState = 1;
             Serial.println("FLANGE ON");
             displayOnOffEffectMenu(1, 1);
         }
         else
         {
             digitalWrite(LED_FX3_PIN, LOW);
+            flangeState = 0;
             Serial.println("FLANGE OFF");
             displayOnOffEffectMenu(1, 0);
         }
@@ -341,10 +390,22 @@ void configurePins(void)
     pinMode(LED_FX3_PIN, OUTPUT);
     pinMode(LED_FX4_PIN, OUTPUT);
     pinMode(SYSTEM_LED, OUTPUT);
-    //Rotary Pins
+    //Rotary Pins - 1
     pinMode(ROT1_A, INPUT_PULLUP);
     pinMode(ROT1_B, INPUT_PULLUP);
     pinMode(ROT1_CLK, INPUT_PULLUP);
+//    //Rotary Pins - 2
+//    pinMode(ROT2_A, INPUT_PULLUP);
+//    pinMode(ROT2_B, INPUT_PULLUP);
+//    pinMode(ROT2_CLK, INPUT_PULLUP);
+//    //Rotary Pins - 3
+//    pinMode(ROT3_A, INPUT_PULLUP);
+//    pinMode(ROT3_B, INPUT_PULLUP);
+//    pinMode(ROT3_CLK, INPUT_PULLUP);
+//    //Rotary Pins - 4
+//    pinMode(ROT4_A, INPUT_PULLUP);
+//    pinMode(ROT4_B, INPUT_PULLUP);
+//    pinMode(ROT4_CLK, INPUT_PULLUP);
 }
 
 void configureAudioAdaptor(void)
@@ -1135,6 +1196,79 @@ void createChorusMenu() {
     setnbVoicesMenu();
 }
 
+void createFlangeMenu() {
+    menuState = menuFlange;
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Gain ");
+    lcd.print("Filt ");
+    lcd.print("Wet  ");
+    lcd.print("Vol  ");
+
+    setGainMenu();
+    setFilterMenu();
+    setWetMenu();
+    setVolMenu();
+
+    lcd.setCursor(0, 2);
+    lcd.print("Flan ");
+    lcd.print("Off  ");
+    lcd.print("Dept ");
+    lcd.print("Dela ");
+
+    displayOnOffEffectMenu(0, 3);
+    //Should set Offset, Depth and DelayRate parameters.
+}
+
+void createDelayMenu() {
+    menuState = menuDelay;
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Gain ");
+    lcd.print("Filt ");
+    lcd.print("Wet  ");
+    lcd.print("Vol  ");
+
+    setGainMenu();
+    setFilterMenu();
+    setWetMenu();
+    setVolMenu();
+
+    lcd.setCursor(0, 2);
+    lcd.print("Delay ");
+    lcd.print("Time  ");
+    lcd.print("Channel  ");
+
+    displayOnOffEffectMenu(0, 3);
+    //Should set Delay, Delay time and channel paramaters.
+}
+
+void createReverbMenu() {
+    menuState = menuReverb;
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Gain ");
+    lcd.print("Filt ");
+    lcd.print("Wet  ");
+    lcd.print("Vol  ");
+
+    setGainMenu();
+    setFilterMenu();
+    setWetMenu();
+    setVolMenu();
+
+    lcd.setCursor(0, 2);
+    lcd.print("Reverb ");
+    lcd.print("Roomsize ");
+    lcd.print("Damping ");
+
+    displayOnOffEffectMenu(0, 3);
+    // Should set Roomsize and damping parameters.
+}
+
 void setnbVoicesMenu() {
     lcd.setCursor(10, 3);
     lcd.print(nbVoices);
@@ -1178,8 +1312,29 @@ void displayOnOffEffectMenu(int valueIndex, int displayStatut) {
     } else {
         lcd.print("OFF  ");
     }
+  } else if(menuState == menuFlange){
+    lcd.setCursor(0, 3);
+    if(flangeState == 1){
+        lcd.print("ON   ");
+    } else {
+        lcd.print("OFF  ");
+    }
+  } else if(menuState == menuDelay){
+    lcd.setCursor(0, 3);
+    if(delayState == 1){
+        lcd.print("ON   ");
+    } else {
+        lcd.print("OFF  ");
+    }
+  } else if(menuState == menuReverb){
+    lcd.setCursor(0, 3);
+    if(reverbState == 1){
+        lcd.print("ON   ");
+    } else {
+        lcd.print("OFF  ");
+    }
   }
-  //No display On/off for 2nd level menu
+
 }
 
 void printParameters(void)
